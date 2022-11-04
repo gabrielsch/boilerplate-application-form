@@ -30,6 +30,9 @@ module.exports = {
         'import/default': 'off',
         'import/export': 'off',
         'no-undef': 'off',
+        'react/require-default-props': 'off',
+        'react/no-unused-prop-types': 'off',
+        '@typescript-eslint/explicit-function-return-type': 'off'
       },
     },
     {

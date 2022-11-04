@@ -127,7 +127,6 @@ export { useKeyEvent } from './hooks/key-event';
 export { useOnClickOutside } from './hooks/click-outside';
 export { usePortal, Portal } from './hooks/portal';
 export { useWindowSize } from './hooks/window-size';
-export { useBreakpoints } from './hooks/breakpoints';
 
 // theme
 export { colors } from './theme/colors';

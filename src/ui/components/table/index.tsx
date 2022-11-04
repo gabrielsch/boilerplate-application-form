@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react/no-array-index-key */
-import React, { useMemo } from 'react';
+import React from 'react';
 import classNames from 'classnames';
 import styled, { keyframes } from 'styled-components';
 import _ from 'lodash';
@@ -13,7 +13,6 @@ import { Column, Cell, Direction } from './lib/types';
 import * as formatters from './lib/formatters';
 import { Padding } from '../padding';
 import { Checkbox } from '../checkbox';
-import { useBreakpoints } from '../../hooks/breakpoints';
 
 export interface TableProps<Data> {
   columns: Column<Data>[];
@@ -78,8 +77,6 @@ function Table<Data>(props: TableProps<Data>): JSX.Element {
     tableHeadBackgroundColor,
   } = props;
   const canSelect = !!setSelected;
-  const responsiveBreakpoints = useBreakpoints();
-
   const table = useTable<Data>({
     data,
     initialSort,
@@ -87,32 +84,6 @@ function Table<Data>(props: TableProps<Data>): JSX.Element {
     limit,
     offset,
   });
-
-  /**
-   * useMemo
-   * Immediately filterColumnsBasedOnBreakpoints on load
-   * if the table is reponsive, we should have a list of responsiveBreakpoints for filtering
-   */
-  const tableColumns = useMemo(() => {
-    return filterColumnsBasedOnBreakpoints(columns, responsiveBreakpoints);
-  }, [responsiveBreakpoints, columns]);
-
-  /**
-   * filterColumnsBasedOnBreakpoints
-   * RESPONSIVE TABLE
-   * filter existing columns
-   * return the column if it's breakpoint is included in responsiveBreakpoints
-   * otherwise return a column that doesnt have 'visibleAtBreakpoint' prop
-   */
-  function filterColumnsBasedOnBreakpoints(tableCols: Column<Data>[], responsiveBpts: string[]): Column<Data>[] {
-    const updatedFilteredColumns = tableCols.filter((column) => {
-      if (column.visibleAtBreakpoint) {
-        return responsiveBpts.includes(column.visibleAtBreakpoint);
-      }
-      return column;
-    });
-    return updatedFilteredColumns;
-  }
 
   function sortByColumn(name: string): () => void {
     return () => table.sort(name);
@@ -146,7 +117,7 @@ function Table<Data>(props: TableProps<Data>): JSX.Element {
 
   return (
     <StyledTableWrapper maxHeight={maxHeight}>
-      <StyledTable data-testid={testId} columns={tableColumns as any} canSelect={canSelect} stickyColumn={stickyColumn}>
+      <StyledTable data-testid={testId} columns={columns} canSelect={canSelect} stickyColumn={stickyColumn}>
         <thead data-testid={`${testId}-thead`}>
           <tr>
             {canSelect && (
@@ -155,7 +126,7 @@ function Table<Data>(props: TableProps<Data>): JSX.Element {
               </SelectableTH>
             )}
 
-            {tableColumns.map((column, idx) => {
+            {columns.map((column, idx) => {
               const { dataField, label, minWidth, sort = true, width } = column;
               // apply custom classes to these <th>s
               const thClasses = classNames({
@@ -209,7 +180,7 @@ function Table<Data>(props: TableProps<Data>): JSX.Element {
                     </Flexbox>
                   </SelectableTD>
                 )}
-                {tableColumns.map((column, idx) => {
+                {columns.map((column, idx) => {
                   const { dataField, label } = column;
                   const key = dataField as keyof Data;
                   const value = _.get(row, key);
